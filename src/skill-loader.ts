@@ -45,12 +45,15 @@ export async function loadMcpJsonFromDir(
       return parsed.mcp as Record<string, McpServerConfig>
     }
 
-    // Support direct { serverName: { command: ... } } format
+    // Support direct { serverName: { command: ... } } or { serverName: { type: "remote", url: ... } } format
     if (parsed && typeof parsed === 'object' && !('mcpServers' in parsed) && !('mcp' in parsed)) {
       const hasCommandField = Object.values(parsed).some(
         (v) => v && typeof v === 'object' && 'command' in (v as Record<string, unknown>)
       )
-      if (hasCommandField) {
+      const hasRemoteConfig = Object.values(parsed).some(
+        (v) => v && typeof v === 'object' && 'type' in (v as Record<string, unknown>) && (v as Record<string, unknown>).type === 'remote'
+      )
+      if (hasCommandField || hasRemoteConfig) {
         return parsed as unknown as Record<string, McpServerConfig>
       }
     }
