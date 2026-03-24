@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs'
+import { promises as fs, Dirent } from 'fs'
 import { join, basename } from 'path'
 import { homedir } from 'os'
 import type { LoadedSkill, McpServerConfig, SkillScope, LazyContent } from './types.js'
@@ -135,7 +135,7 @@ export async function loadSkillsFromDir(
   skillsDir: string,
   scope: SkillScope
 ): Promise<LoadedSkill[]> {
-  const entries = await fs.readdir(skillsDir, { withFileTypes: true }).catch(() => [])
+  const entries: Dirent<string>[] = await fs.readdir(skillsDir, { withFileTypes: true }).catch(() => [])
   const skills: LoadedSkill[] = []
 
   for (const entry of entries) {
@@ -194,18 +194,18 @@ export async function loadSkillsFromDir(
 }
 
 /**
- * Discover skills from opencode global directory (~/.config/opencode/skill/)
+ * Discover skills from opencode global directory (~/.config/opencode/skills/)
  */
 export async function discoverOpencodeGlobalSkills(): Promise<LoadedSkill[]> {
-  const opencodeSkillsDir = join(homedir(), '.config', 'opencode', 'skill')
+  const opencodeSkillsDir = join(homedir(), '.config', 'opencode', 'skills')
   return loadSkillsFromDir(opencodeSkillsDir, 'opencode')
 }
 
 /**
- * Discover skills from opencode project directory (.opencode/skill/)
+ * Discover skills from opencode project directory (.opencode/skills/)
  */
 export async function discoverOpencodeProjectSkills(): Promise<LoadedSkill[]> {
-  const opencodeProjectDir = join(process.cwd(), '.opencode', 'skill')
+  const opencodeProjectDir = join(process.cwd(), '.opencode', 'skills')
   return loadSkillsFromDir(opencodeProjectDir, 'opencode-project')
 }
 
